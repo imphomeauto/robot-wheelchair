@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-import time
 from SunFounder_TB6612 import TB6612
 import RPi.GPIO as GPIO
-import urllib, json
+import socket
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -11,6 +10,33 @@ a = GPIO.PWM(27, 60)
 b = GPIO.PWM(22, 60)
 a.start(0)
 b.start(0)
+
+rX = -1
+rY = -1
+dir = '-'
+
+class Pos(threading.Thread):	
+	def __init__(self):
+		threading.Thread.__init__(self)
+		print('started thread')
+				
+	def run(self):
+		global rX
+		global rY
+		global dir
+		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		server_address = ('ips.local', 8000)
+		sock.connect(server_address)
+		message = 'pos';
+		
+		while True:
+			sock.sendall(message)
+			data = sock.recv(9)
+			if data:
+				arr = data.split(',')
+				rX = int(arr[0])
+				rY = int(arr[1])
+				dir = arr[2]
 
 def a_speed(value):
 	a.ChangeDutyCycle(value)
@@ -24,33 +50,14 @@ motorB = TB6612.Motor(18)
 motorA.pwm = a_speed
 motorB.pwm = b_speed
 
-url = "http://ips.local:8000"
-
-def main():	
-	
-	response = urllib.urlopen(url)
-	data = json.loads(response.read())
-	posX = data["x"]
-	posY = data["y"]
-	print "x: " + str(data["x"]) + " - y: " + str(data["y"])
-	
-	if (posX < 0) or (posY < 0):
-		destroy()
-	
-	motorA.speed = 23
-	motorB.speed = 20
-	
+def main():		
 	#direction ahead
 	motorA.forward()
 	motorB.forward()
 
-	while posX <= 20:
-	
-		response = urllib.urlopen(url)
-		data = json.loads(response.read())
-		posX = data["x"]
-		posY = data["y"]
-		print "x: " + str(data["x"]) + " - y: " + str(data["y"])
+	while rX <= 20:
+		motorA.speed = 23
+		motorB.speed = 20
 
 	destroy()
 
@@ -60,6 +67,8 @@ def destroy():
 	GPIO.cleanup()
 
 if __name__ == '__main__':
+	pos = Pos()
+	pos.start()
 	try:
 		main()
 	except KeyboardInterrupt:
