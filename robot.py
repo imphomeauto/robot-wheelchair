@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+from __future__ import absolute_import
+from Queue import Queue
 from SunFounder_TB6612 import TB6612
 import RPi.GPIO as GPIO
 import socket
@@ -24,7 +25,6 @@ def b_speed(value):
 	
 motorA = TB6612.Motor(17)
 motorB = TB6612.Motor(18)
-
 motorA.pwm = a_speed
 motorB.pwm = b_speed
 
@@ -32,9 +32,38 @@ motorB.pwm = b_speed
 
 GPIO.setup(20, GPIO.IN)	
 GPIO.setup(5, GPIO.IN)
+turnLeftEnc = 347
+turnRightEnc = 347
 
-turnLeftEnc = 355
-turnRightEnc = 355
+# INS VARIABLES
+maze='''\
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 1
+1 1 1 0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 1
+1 1 1 0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 1
+1 1 1 0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 1
+1 1 1 0 0 0 0 0 0 1 1 1 1 1 0 0 0 0 0 0 0 0 0 1
+1 1 1 1 1 1 1 0 0 1 1 1 1 1 0 0 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 0 0 1 1 1 1 1 0 0 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 0 0 1 1 1 1 1 0 0 1 1 1 1 1 1 1 1
+1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+'''
+
+matrix=maze.splitlines()
+matrix=[i.strip() for i in matrix]
+matrix=[i.split() for i in matrix]
+numrows, numcols = len(matrix), len(matrix[0])
+
+step = {'U': (-1, 0), 'D': (1, 0), 'R': (0, 1), 'L': (0, -1)}
 
 # IPS VARIABLES
 
@@ -59,7 +88,7 @@ class Pos(threading.Thread):
 		
 		while True:
 			sock.sendall(message)
-			data = sock.recv(7)
+			data = sock.recv(5)
 			if data:
 				arr = data.split(',')
 				rX = int(arr[0])
@@ -85,11 +114,12 @@ class RequestHandler(BaseHTTPRequestHandler):
 			robot_left()
 		elif self.path == '/r' :
 			robot_right()
+		elif self.path.startswith( '/n', 0, 2 ) :
+			navigate(str(self.path[2:]))
 		self.wfile.write(output)
 
 
-def robot_ahead(destination):
-	global dir
+def robot_ahead(destination, direction):
 	global rX
 	global rY
 	
@@ -97,28 +127,35 @@ def robot_ahead(destination):
 	motorA.forward()
 	motorB.forward()
 	
-	if dir == 'R' :
-		while rX <= destination:
-			motorA.speed = 23
+	if direction == 'R' :
+		while rX < destination:
+			print 'x: %s - dest %s' % (rX, destination)
+			motorA.speed = 22
 			motorB.speed = 20
-	elif dir == 'L' :
-		while rX >= destination:
-			motorA.speed = 23
+	elif direction == 'L' :
+		while rX > destination:
+			print 'x: %s - dest %s' % (rX, destination)
+			motorA.speed = 22
 			motorB.speed = 20
-	elif dir == 'D' :
-		while rY <= destination:
-			motorA.speed = 23
+	elif direction == 'D' :
+		while rY < destination:
+			print 'y: %s - dest %s' % (rY, destination)
+			motorA.speed = 22
 			motorB.speed = 20
-	elif dir == 'U' :
-		while rY <= destination:
-			motorA.speed = 23
+	elif direction == 'U' :
+		while rY > destination:
+			print 'y: %s - dest %s' % (rY, destination)
+			motorA.speed = 22
 			motorB.speed = 20
 	
-	robot_stop()
+	motorA.stop()
+	motorB.stop()
 
 	
 def robot_left():	
 	global dir
+	
+	print 'turn left'
 	
 	#direction left
 	motorA.forward()
@@ -157,18 +194,11 @@ def robot_left():
 		if stateCountA >= turnLeftEnc and stateCountB >= turnLeftEnc:
 			turn = False
 	
-	if dir == 'R' :
-		dir = 'U'
-	elif dir == 'L' :
-		dir = 'D'
-	elif dir == 'D' :
-		dir = 'R'
-	elif dir == 'U' :
-		dir = 'L'
-
 	
 def robot_right():
 	global dir
+	
+	print 'turn right'
 	
 	#direction right
 	motorA.backward()
@@ -206,21 +236,114 @@ def robot_right():
 		
 		if stateCountA >= turnRightEnc and stateCountB >= turnRightEnc:
 			turn = False
+		
+
+def navigate(destination):
+	global dir
+	global rX
+	global rY
+		
+	startx,starty=rX,rY
 	
-	if dir == 'R' :
-		dir = 'D'
-	elif dir == 'L' :
-		dir = 'U'
-	elif dir == 'D' :
-		dir = 'L'
-	elif dir == 'U' :
-		dir = 'R'
-
-
-def robot_stop():
-	motorA.stop()
-	motorB.stop()
-
+	destx,desty=-1,-1
+	
+	if destination == 'kitchen':
+		destx,desty=20,15
+	elif destination == 'toilet':
+		destx,desty=5,5
+	elif destination == 'bedroom':
+		destx,desty=20,5
+	elif destination == 'entrance':
+		destx,desty=4,13
+		
+	if (startx < 0) or (starty < 0) or (desty < 0) or (destx < 0):
+		return
+	
+	q=Queue()
+	
+	row,col=desty,destx
+	
+	q.put((row,col))
+	while not q.empty():
+		row, col = q.get()
+		if col+1 < numcols and matrix[row][col+1] == "0":
+			q.put((row, col+1))
+			matrix[row][col+1] = "L"
+		if row+1 < numrows and matrix[row+1][col] == "0":
+			q.put((row+1, col))
+			matrix[row+1][col] = "U"
+		if 0 <= col-1 and matrix[row][col-1] == "0":
+			q.put((row, col-1))
+			matrix[row][col-1] = "R"
+		if 0 <= row-1 and matrix[row-1][col] == "0":
+			q.put((row-1, col))
+			matrix[row-1][col] = "D"
+	
+	row,col=starty,startx
+	var=matrix[row][col]
+	
+	if var == "0":
+		# already at destination
+		return
+	
+	while True:
+		if row == desty and col == destx:
+			break
+		
+		if (dir == 'R' and var == 'U' ) or (dir == 'L' and var == 'D' ):
+			robot_left()
+			dir = var
+			continue
+		elif (dir == 'R' and var == 'D' ) or (dir == 'L' and var == 'U' ):
+			robot_right()
+			dir = var
+			continue
+		elif (dir == 'U' and var == 'R' ) or (dir == 'D' and var == 'L' ):
+			robot_right()
+			dir = var
+			continue
+		elif (dir == 'U' and var == 'L' ) or (dir == 'D' and var == 'R' ):
+			robot_left()
+			dir = var
+			continue
+		elif (dir == 'U' and var == 'D' ):
+			robot_left()
+			dir = 'L'
+			continue
+		elif (dir == 'R' and var == 'L' ):
+			robot_right()
+			dir = 'D'
+			continue
+		elif (dir == 'D' and var == 'U' ):
+			robot_left()
+			dir = 'R'
+			continue
+		elif (dir == 'L' and var == 'R' ):
+			robot_right()
+			dir = 'U'
+			continue
+		
+		axetomove = '-'
+		
+		while var == dir:
+			r, c = step[var]
+			row += r
+			col += c
+			var = matrix[row][col]
+			if r == 0:
+				axetomove = 'x'
+			else:
+				axetomove = 'y'
+		
+		if axetomove == 'x':
+			print 'moving to %s (axe x)' % col
+			robot_ahead(col, dir)
+			continue
+		elif axetomove == 'y':
+			print 'moving to %s (axe y)' % row
+			robot_ahead(row, dir)
+			continue
+	
 
 if __name__ == '__main__':
 	server = MyHTTPServer(('', 8000), RequestHandler)
