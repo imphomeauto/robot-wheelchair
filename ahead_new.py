@@ -2,6 +2,9 @@
 from SunFounder_TB6612 import TB6612
 import RPi.GPIO as GPIO
 import socket
+import threading
+
+# MOTORS VARIABLES
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -11,9 +14,25 @@ b = GPIO.PWM(22, 60)
 a.start(0)
 b.start(0)
 
+def a_speed(value):
+	a.ChangeDutyCycle(value)
+
+def b_speed(value):
+	b.ChangeDutyCycle(value)
+	
+motorA = TB6612.Motor(17)
+motorB = TB6612.Motor(18)
+
+motorA.pwm = a_speed
+motorB.pwm = b_speed
+
+# IPS VARIABLES
+
 rX = -1
 rY = -1
 dir = '-'
+
+# IPS THREAD
 
 class Pos(threading.Thread):	
 	def __init__(self):
@@ -37,25 +56,14 @@ class Pos(threading.Thread):
 				rX = int(arr[0])
 				rY = int(arr[1])
 				dir = arr[2]
-
-def a_speed(value):
-	a.ChangeDutyCycle(value)
-
-def b_speed(value):
-	b.ChangeDutyCycle(value)
-	
-motorA = TB6612.Motor(17)
-motorB = TB6612.Motor(18)
-
-motorA.pwm = a_speed
-motorB.pwm = b_speed
+				print 'X "%s", Y "%s", dir "%s"' % (rX, rY, dir)
 
 def main():		
 	#direction ahead
 	motorA.forward()
 	motorB.forward()
 
-	while rX <= 20:
+	while rX <= 40:
 		motorA.speed = 23
 		motorB.speed = 20
 

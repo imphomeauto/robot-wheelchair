@@ -38,8 +38,8 @@ def main():
 	motorA.pwm = a_speed
 	motorB.pwm = b_speed
 
-	motorA.speed = 30
-	motorB.speed = 30
+	motorA.speed = 29
+	motorB.speed = 28
 	
 	#direction left
 	motorA.forward()
@@ -52,25 +52,21 @@ def main():
 		if stateCurrentA1 != stateLastA1:
 			stateLastA1 = stateCurrentA1
 			stateCountA += 1
-			print "Encoder A: "+ str(stateCountA)
 		
-		if stateCountA == 170:
+		if stateCountA >= 355:
 			motorA.stop()
 	
 		if stateCurrentB1 != stateLastB1:
 			stateLastB1 = stateCurrentB1
 			stateCountB += 1
-			print "Encoder B: "+ str(stateCountB)
 			
-		if stateCountB == 170:
+		if stateCountB >= 355:
 			motorB.stop()
 			
-		if stateCountA > 170 and stateCountB > 170:
+		if stateCountA >= 355 and stateCountB >= 355:
 			destroy()
 
 def destroy():
-	motorA.stop()
-	motorB.stop()
 	GPIO.cleanup()
 
 if __name__ == '__main__':

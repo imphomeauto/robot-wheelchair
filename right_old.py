@@ -31,13 +31,13 @@ def main():
 	motorA.pwm = a_speed
 	motorB.pwm = b_speed
 
-	motorA.speed = 30
-	motorB.speed = 30
+	motorA.speed = 29
+	motorB.speed = 29
 
 	# avanti
 	motorA.backward()
 	motorB.forward()
-	time.sleep(0.67)
+	time.sleep(0.85)
 	motorA.stop()
 	motorB.stop()
 
