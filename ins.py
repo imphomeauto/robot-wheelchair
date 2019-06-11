@@ -1,16 +1,23 @@
 from __future__ import absolute_import
 from Queue import Queue
 
+
+
+
+
+
 maze='''\
-0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
-1 1 1 1 1 0 0 1 0 0 1 1 1 1 1 1
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 0 0 0 0 1 1 0 0 0 0 0 0 1
+1 0 0 0 0 1 1 0 0 0 0 0 0 1
+1 1 1 0 1 1 1 1 0 1 1 1 1 1
+1 1 1 0 1 1 1 1 0 1 1 1 1 1
+1 1 1 0 1 1 1 1 0 1 1 1 1 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1
 '''
 
 def show(matrix):
@@ -25,15 +32,15 @@ numrows, numcols = len(matrix), len(matrix[0])
 
 print 'MAP LEGEND\n0: clear space\n1: wall/obstacle\n'
 
-show(matrix)
+#show(matrix)
 
 q=Queue()
 
 startx,starty=1,7
-#destx,desty=3,2 # toilet
-#destx,desty=12,2 # bedroom
-destx,desty=13,6 # kitchen
-#destx,desty=1,7 # entrace
+#destx,desty=4,2 # toilet
+destx,desty=10,2 # bedroom
+#destx,desty=12,9 # kitchen
+#destx,desty=2,9 # entrace
 
 row,col=desty,destx
 
@@ -57,7 +64,7 @@ row,col=starty,startx
 
 var=matrix[row][col]
 
-#show(matrix)
+show(matrix)
 
 if var=="0":
     exit()
@@ -65,7 +72,7 @@ if var=="0":
 # Trace the path
 step = {'U': (-1, 0), 'D': (1, 0), 'R': (0, 1), 'L': (0, -1)}
 
-dir = 'L'
+dir = 'U'
 
 print 'robot position (%s, %s)' % (startx, starty)
 print 'robot direction %s \n' % dir

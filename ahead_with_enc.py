@@ -40,11 +40,9 @@ encoderB_prev_error = 0
 encoderA_sum_error = 0
 encoderB_sum_error = 0
 
-SAMPLETIME = 0.1
+SAMPLETIME = 0.04
 TARGET = 18
-
-url = "http://ips.local:8000"
-
+				
 class Encoders(threading.Thread):	
 	def __init__(self):
 		threading.Thread.__init__(self)
@@ -68,7 +66,7 @@ class Encoders(threading.Thread):
 				encoderB = encoderB_read
 				encoderB_value += 1
 
-			#print "enA: "+ str(encoderA_value) + " - enB: " + str(encoderB_value)
+			print "enA: "+ str(encoderA_value) + " - enB: " + str(encoderB_value)
 
 def main():
 	enc = Encoders()
@@ -83,8 +81,8 @@ def main():
 	global encoderA_sum_error
 	global encoderB_sum_error
 	
-	motorA.speed = 22
-	motorB.speed = 20
+	motorA.speed = 3
+	motorB.speed = 2
 	
 	#direction ahead
 	motorA.forward()
@@ -92,12 +90,6 @@ def main():
 
 	time.sleep(SAMPLETIME)
 	
-	response = urllib.urlopen(url)
-	data = json.loads(response.read())
-	print data["x"]
-	print data["y"]
-	print data["dir"]
-
 	while True:
 		
 		new_motorA_speed = motorA.speed + (TARGET - encoderA_value)
