@@ -1,22 +1,17 @@
 from __future__ import absolute_import
 from Queue import Queue
 
-
-
-
-
-
 maze='''\
 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-1 0 0 0 0 1 1 0 0 0 0 0 0 1
-1 0 0 0 0 1 1 0 0 0 0 0 0 1
-1 1 1 0 1 1 1 1 0 1 1 1 1 1
-1 1 1 0 1 1 1 1 0 1 1 1 1 1
-1 1 1 0 1 1 1 1 0 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 0 0 0 0 1 1 1 0 0 0 0 0 1
+1 1 1 1 0 1 1 1 0 1 1 1 1 1
+1 1 1 1 0 1 1 1 0 1 1 1 1 1
+1 1 1 1 0 1 1 1 0 1 1 1 1 1
+1 1 1 1 0 1 1 1 0 1 1 1 1 1
 1 0 0 0 0 0 0 0 0 0 0 0 0 1
-1 0 0 0 0 0 0 0 0 0 0 0 0 1
-1 0 0 0 0 0 0 0 0 0 0 0 0 1
-1 0 0 0 0 0 0 0 0 0 0 0 0 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 '''
 
@@ -36,29 +31,50 @@ print 'MAP LEGEND\n0: clear space\n1: wall/obstacle\n'
 
 q=Queue()
 
-startx,starty=1,7
-#destx,desty=4,2 # toilet
-destx,desty=10,2 # bedroom
-#destx,desty=12,9 # kitchen
-#destx,desty=2,9 # entrace
+startx,starty=12,1
+destx,desty=4,2 # toilet
+#destx,desty=10,2 # bedroom
+#destx,desty=10,7 # kitchen
+#destx,desty=2,7 # entrace
+dir = 'U'
+
+# error position correction, max 2 steps of correction, should not be more
+if matrix[starty][startx] == "1":
+	matrix[starty][startx] = "0"
+if matrix[starty][startx+1] == "1":
+	matrix[starty][startx+1] = "0"
+if matrix[starty][startx-1] == "1":
+	matrix[starty][startx-1] = "0"
+if matrix[starty+1][startx] == "1":
+	matrix[starty+1][startx] = "0"
+if matrix[starty+1][startx+1] == "1":
+	matrix[starty+1][startx+1] = "0"
+if matrix[starty+1][startx-1] == "1":
+	matrix[starty+1][startx-1] = "0"
+if matrix[starty-1][startx] == "1":
+	matrix[starty-1][startx] = "0"
+if matrix[starty-1][startx+1] == "1":
+	matrix[starty-1][startx+1] = "0"
+if matrix[starty-1][startx-1] == "1":
+	matrix[starty-1][startx-1] = "0"
 
 row,col=desty,destx
 
 q.put((row,col))
 while not q.empty():
-    row, col = q.get()
-    if col+1 < numcols and matrix[row][col+1] == "0":
-         q.put((row, col+1))
-         matrix[row][col+1] = "L"
-    if row+1 < numrows and matrix[row+1][col] == "0":
-         q.put((row+1, col))
-         matrix[row+1][col] = "U"
-    if 0 <= col-1 and matrix[row][col-1] == "0":
-         q.put((row, col-1))
-         matrix[row][col-1] = "R"
-    if 0 <= row-1 and matrix[row-1][col] == "0":
-         q.put((row-1, col))
-         matrix[row-1][col] = "D"
+	row, col = q.get()	
+	if col+1 < numcols and matrix[row][col+1] == "0":
+		q.put((row, col+1))
+		matrix[row][col+1] = "L"
+	if row+1 < numrows and matrix[row+1][col] == "0":
+		q.put((row+1, col))
+		matrix[row+1][col] = "U"
+	if 0 <= col-1 and matrix[row][col-1] == "0":
+		q.put((row, col-1))
+		matrix[row][col-1] = "R"
+	if 0 <= row-1 and matrix[row-1][col] == "0":
+		q.put((row-1, col))
+		matrix[row-1][col] = "D"
           
 row,col=starty,startx
 
@@ -66,13 +82,14 @@ var=matrix[row][col]
 
 show(matrix)
 
-if var=="0":
+if var == '0' :
     exit()
+elif var == '1' :
+	print 'robot position not in the path'
+	exit()
 
 # Trace the path
 step = {'U': (-1, 0), 'D': (1, 0), 'R': (0, 1), 'L': (0, -1)}
-
-dir = 'U'
 
 print 'robot position (%s, %s)' % (startx, starty)
 print 'robot direction %s \n' % dir
@@ -84,54 +101,47 @@ while True:
 	    break
 	
 	if (dir == 'R' and var == 'U' ) or (dir == 'L' and var == 'D' ):
-		print 'turn left'
+		print 'turn left, robot position (%s, %s)' % (startx, starty)
 		dir = var
-		continue
 	elif (dir == 'R' and var == 'D' ) or (dir == 'L' and var == 'U' ):
-		print 'turn right'
+		print 'turn right, robot position (%s, %s)' % (startx, starty)
 		dir = var
-		continue
 	elif (dir == 'U' and var == 'R' ) or (dir == 'D' and var == 'L' ):
-		print 'turn right'
+		print 'turn right, robot position (%s, %s)' % (startx, starty)
 		dir = var
-		continue
 	elif (dir == 'U' and var == 'L' ) or (dir == 'D' and var == 'R' ):
-		print 'turn left'
+		print 'turn left, robot position (%s, %s)' % (startx, starty)
 		dir = var
-		continue
 	elif (dir == 'U' and var == 'D' ):
-		print 'turn left'
+		print 'turn left, robot position (%s, %s)' % (startx, starty)
 		dir = 'L'
-		continue
 	elif (dir == 'R' and var == 'L' ):
-		print 'turn right'
+		print 'turn right, robot position (%s, %s)' % (startx, starty)
 		dir = 'D'
-		continue
 	elif (dir == 'D' and var == 'U' ):
-		print 'turn left'
+		print 'turn left, robot position (%s, %s)' % (startx, starty)
 		dir = 'R'
-		continue
 	elif (dir == 'L' and var == 'R' ):
-		print 'turn right'
+		print 'turn right, robot position (%s, %s)' % (startx, starty)
 		dir = 'U'
-		continue
-		
-	movement = 0 
-	
-	while var == dir:
-		r, c = step[var]
-		row += r
-		col += c
-		var = matrix[row][col]
-		if r == 0:
-			movement += c
-		else:
-			movement += r
-	
-	if movement != 0:
-		print 'move %s steps (direction %s)' % (movement, dir) 
-		continue
+	elif var == dir:
+		movement = 0 
+		while var == dir:
+			if row == desty and col == destx :
+				break
+			r, c = step[var]
+			row += r
+			col += c
+			if r == 0:
+				movement += c
+				startx += c
+			else:
+				movement += r
+				starty += r
+			var = matrix[row][col]
+		if movement != 0:
+			print 'move %s steps direction %s' % (movement, dir), 
+			print '-> robot position (%s, %s)' % (startx, starty)
 
 print
 print 'finish (%s, %s)' % (row, col)	
-
