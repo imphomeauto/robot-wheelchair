@@ -31,7 +31,7 @@ print 'MAP LEGEND\n0: clear space\n1: wall/obstacle\n'
 
 q=Queue()
 
-startx,starty=12,1
+startx,starty=1,7
 destx,desty=4,2 # toilet
 #destx,desty=10,2 # bedroom
 #destx,desty=10,7 # kitchen

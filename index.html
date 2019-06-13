@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="icon" href="/docs/4.0/assets/img/favicons/favicon.ico">
+<title>IHA</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<style type="text/css">
+html,
+body {
+height: 100%;
+}
+body {
+display: -ms-flexbox;
+display: -webkit-box;
+display: flex;
+-ms-flex-align: center;
+-ms-flex-pack: center;
+-webkit-box-align: center;
+align-items: center;
+-webkit-box-pack: center;
+justify-content: center;
+padding-top: 40px;
+padding-bottom: 40px;
+background-color: #f5f5f5;
+}
+.wrapper {
+width: 100%;
+max-width: 330px;
+padding: 15px;
+margin: 0 auto;
+}
+button small{
+	display: none;
+}
+button:disabled small{
+	display: inline;
+}
+#loading {
+display: none;
+position: fixed;
+width: 100vw;
+height: 100vh;
+z-index: 999;
+top: 0;
+left: 0;
+background-color: rgba(255,255,255,0.75);
+}
+#loading span{
+	position: absolute;
+	height: 100px;
+	width: 100px;
+	top: 50%;
+	left: 50%;
+	margin: -50px 0 0 -50px;
+}
+#loading svg{
+	height: 100px;
+	width: 100px;
+	-webkit-animation:shake-horizontal 3s both infinite;
+	animation:shake-horizontal 3s both infinite;
+}
+@-webkit-keyframes shake-horizontal{0%,100%{-webkit-transform:translateX(0);transform:translateX(0)}10%,30%,50%,70%{-webkit-transform:translateX(-10px);transform:translateX(-10px)}20%,40%,60%{-webkit-transform:translateX(10px);transform:translateX(10px)}80%{-webkit-transform:translateX(8px);transform:translateX(8px)}90%{-webkit-transform:translateX(-8px);transform:translateX(-8px)}}@keyframes shake-horizontal{0%,100%{-webkit-transform:translateX(0);transform:translateX(0)}10%,30%,50%,70%{-webkit-transform:translateX(-10px);transform:translateX(-10px)}20%,40%,60%{-webkit-transform:translateX(10px);transform:translateX(10px)}80%{-webkit-transform:translateX(8px);transform:translateX(8px)}90%{-webkit-transform:translateX(-8px);transform:translateX(-8px)}}
+</style>
+</head>
+<body class="text-center">
+<div class="wrapper">
+<h1 class="h3 mb-3 font-weight-normal">IHA</h1>
+<p>Where do you want to go?</p>
+<button class="btn btn-lg btn-dark btn-block goto" type="button" id="entrance">Entrance <small>(you're here)</small></button>
+<button class="btn btn-lg btn-dark btn-block goto" type="button" id="toilet">Toilet <small>(you're here)</small></button>
+<button class="btn btn-lg btn-dark btn-block goto" type="button" id="bedroom">Bedroom <small>(you're here)</small></button>
+<button class="btn btn-lg btn-dark btn-block goto" type="button" id="kitchen">Kitchen <small>(you're here)</small></button>
+<p></p>
+<p><small>debug: <span id="debug"></span><small></p>
+<p><small>&copy; Mohammed Tantawy 6102, Davide Bragagnolo 6678<small></p>
+<p><small>Advanced Studio 2 Project for AIT @ Melbourne<small></p>
+</div>
+<div id="loading"><span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M 42.5 2 C 39.462434 2 37 4.4624339 37 7.5 C 37 10.537566 39.462434 13 42.5 13 C 45.537566 13 48 10.537566 48 7.5 C 48 4.4624339 45.537566 2 42.5 2 z M 25.71875 4.9375 C 24.488625 4.953375 23.27525 5.34175 22.40625 6.15625 L 13.875 14.5625 C 13.28 15.1475 12.96575 15.915 12.96875 16.75 C 12.97275 17.585 13.30525 18.3575 13.90625 18.9375 C 15.07825 20.0665 16.931 20.105 18.125 19 L 25.5 12.1875 L 29.6875 15.3125 L 27.25 18.1875 C 30.952 18.7115 34.2495 20.48375 36.6875 23.09375 L 39 19.875 C 40.648 17.598 40.19975 14.46 37.96875 12.75 L 29.15625 6 C 28.21475 5.279 26.948875 4.921625 25.71875 4.9375 z M 25 20 C 23.51075 20 22.064719 20.222969 20.71875 20.65625 C 20.381961 20.764473 20.043823 20.898685 19.71875 21.03125 C 19.402913 21.160984 19.085041 21.317004 18.78125 21.46875 C 18.468959 21.624571 18.142194 21.790758 17.84375 21.96875 C 16.063183 23.03603 14.529473 24.497348 13.375 26.21875 C 13.203236 26.475278 13.061183 26.731881 12.90625 27 L 7 27 A 1.0001 1.0001 0 0 0 6.90625 27 A 1.001098 1.001098 0 0 0 7 29 L 14.09375 29 L 18 29 C 18.552 29 19 29.447 19 30 C 19 30.553 18.552 31 18 31 L 13.40625 31 L 11.34375 31 C 11.23775 31.484 11.15025 31.9685 11.09375 32.46875 C 11.074281 32.642281 11.075481 32.824575 11.0625 33 L 3 33 A 1.0001 1.0001 0 0 0 2.90625 33 A 1.001098 1.001098 0 0 0 3 35 L 13.0625 35 L 23 35 C 23.552 35 24 35.447 24 36 C 24 36.553 23.552 37 23 37 L 13.40625 37 L 11.34375 37 C 11.495158 37.690771 11.686936 38.352292 11.9375 39 L 8 39 A 1.0001 1.0001 0 0 0 7.90625 39 A 1.001098 1.001098 0 0 0 8 41 L 12.90625 41 L 18 41 C 18.552 41 19 41.447 19 42 C 19 42.553 18.552 43 18 43 L 17.09375 43 L 14.28125 43 C 14.92375 43.76325 15.648547 44.450641 16.4375 45.0625 C 16.831961 45.368477 17.229869 45.674365 17.65625 45.9375 C 19.792082 47.261423 22.307871 48 25 48 C 30.298094 48 34.935252 45.038623 37.3125 40.6875 C 37.316896 40.679407 37.308119 40.664352 37.3125 40.65625 C 38.391357 38.672705 39 36.4125 39 34 C 39 31.578094 38.399071 29.301519 37.3125 27.3125 C 37.096978 26.915759 36.84534 26.559902 36.59375 26.1875 C 35.339626 24.332456 33.660936 22.765765 31.6875 21.6875 C 31.679407 21.683104 31.664352 21.691881 31.65625 21.6875 C 29.672839 20.608643 27.4125 20 25 20 z M 40.25 29.21875 C 40.725 30.73175 41 32.333 41 34 C 41 38.815 38.84475 43.1275 35.46875 46.0625 C 35.73075 46.1265 35.988 46.15625 36.25 46.15625 C 37.554 46.15625 38.824 45.42225 39.375 44.15625 L 43.15625 35.40625 C 44.13925 33.14625 43.125 30.47775 40.875 29.46875 L 40.25 29.21875 z"/></svg></span></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+var request = $.ajax({ 
+    type: 'GET', 
+    url: '/init',
+    timeout: 0,
+    dataType: 'json',
+    success: function (data) { 
+        $('#debug').text(JSON.stringify(data, null, 4));
+        $('#'+data.room).prop('disabled', true);
+    }
+});
+$('.goto').click(function(e){
+	e.preventDefault();
+	var button = $(this);
+	var isDisabled = button.prop('disabled');
+	if(!isDisabled){
+		$('#loading').fadeIn();
+		$('.goto').prop('disabled', false);
+		var destination = button.attr('id');
+		request = $.ajax({ 
+		    type: 'GET', 
+		    url: '/go_' + destination,
+		    timeout: 0,
+		    dataType: 'json',
+		    success: function (data) { 
+		    	$('#loading').fadeOut();
+		    	button.prop('disabled', true);
+		    	$('#debug').text(JSON.stringify(data, null, 4));
+		    }
+		});
+	}
+});
+$('#loading').dblclick(function(){
+	$('#loading').fadeOut();
+	request.abort();
+});
+});
+</script>
+</body>
+</html>
