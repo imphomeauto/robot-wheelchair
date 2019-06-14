@@ -34,8 +34,8 @@ GPIO.setup(20, GPIO.IN)
 encoderA = GPIO.input(20)
 GPIO.setup(5, GPIO.IN)
 encoderB = GPIO.input(5)
-turnLeftEnc = 359
-turnRightEnc = 359
+turnLeftEnc = 362
+turnRightEnc = 362
 encoderA_value = 0
 encoderB_value = 0
 encoderA_prev_error = 0
@@ -132,7 +132,7 @@ class Lights(threading.Thread):
 				room == 'kitchen'
 				urllib2.urlopen("http://192.168.1.4/offall")
 				urllib2.urlopen("http://192.168.1.4/on/6")
-			elif rX < 0 and rY < 0 and light != -1:
+			elif rX < 0 and rY < 0:
 				light = -1
 				room = 'out'
 				#out of the home, off all
@@ -142,8 +142,7 @@ class Lights(threading.Thread):
 class Encoders(threading.Thread):	
 	def __init__(self):
 		threading.Thread.__init__(self)
-		print('encoders thread started')
-		
+		print('encoders thread start')
 	def run(self):
 		self.kill = False
 		global encoderA
@@ -153,14 +152,13 @@ class Encoders(threading.Thread):
 		while not self.kill:
 			encoderA_read = GPIO.input(20)
 			encoderB_read = GPIO.input(5)
-		
 			if encoderA_read != encoderA:
 				encoderA = encoderA_read
 				encoderA_value += 1
-		
 			if encoderB_read != encoderB:
 				encoderB = encoderB_read
 				encoderB_value += 1
+		print('encoders thread stop')
 
 class MyHTTPServer(HTTPServer):
 	def __init__(self, *args, **kwargs):
